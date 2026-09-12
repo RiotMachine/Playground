@@ -10,6 +10,7 @@ int main(int argc, char* argv[])
         std::cout << " you";
     else
     {
+        // program call itself is first arg
         for (int i{ 1 }; i < argc; ++i)
             std::cout << ' ' << argv[i];
     }
