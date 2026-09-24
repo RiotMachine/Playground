@@ -52,6 +52,7 @@ public:
         )};
         m_sentinel->next->prev = n;
         m_sentinel->next = n;
+        ++m_size;
     }
 
     void postpend(const T& val)
@@ -61,6 +62,7 @@ public:
         )};
         m_sentinel->prev->next = n;
         m_sentinel->prev = n;
+        ++m_size;
     }
 
     int search(const T& val) const
@@ -85,6 +87,7 @@ private:
     {
         n->prev->next = n->next;
         n->next->prev = n->prev;
+        --m_size;
     }
 
     std::size_t m_size{ };
