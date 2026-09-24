@@ -15,24 +15,21 @@ class DoubleLinkedList
 {
 public:
     DoubleLinkedList(std::initializer_list<T> list)
-      : m_size{ list.size() }, m_sentinel{ std::make_shared<Node>(this, this) }
+      : m_size{ list.size() }, m_sentinel{ std::make_shared<Node>() }
     {
+        m_sentinel->next = m_sentinel->prev = m_sentinel;
         for (const auto& e : list)
             postpend(e);
     }
 
     ~DoubleLinkedList()
     {
-        std::shared_ptr<Node> tracer{ m_sentinel.next };
-        while (m_sentinel->next.get() != this)
-        {
-            std::shared_ptr<Node> next{ tracer.next };
-            remove(tracer);
-            tracer = next;
-        }
+        while (m_sentinel->next != m_sentinel)
+            remove(m_sentinel->next);
+        m_sentinel = m_sentinel->next = m_sentinel->prev = nullptr;
     }
 
-    int size() const   { return m_size; }
+    std::size_t size() const   { return m_size; }
     bool empty() const { return m_size == 0; }
 
     //Node* begin() const { return m_sentinel.next.get(); }
@@ -50,30 +47,30 @@ public:
 
     void prepend(const T& val)
     {
-        auto n{ 
-            std::make_shared<Node>(m_sentinel.next, m_sentinel.next->prev, val)
-        };
-        m_sentinel.next->prev = n;
-        m_sentinel.next = n;
+        auto n{ std::make_shared<Node>(
+            Node { m_sentinel->next, m_sentinel->next->prev, val }
+        )};
+        m_sentinel->next->prev = n;
+        m_sentinel->next = n;
     }
 
     void postpend(const T& val)
     {
-        auto n{
-            std::make_shared<Node>(m_sentinel.prev->next, m_sentinel.prev, val)
-        };
-        m_sentinel.prev->next = n;
-        m_sentinel.prev = n;
+        auto n{ std::make_shared<Node>(
+            Node { m_sentinel->prev->next, m_sentinel->prev, val }
+        )};
+        m_sentinel->prev->next = n;
+        m_sentinel->prev = n;
     }
 
     int search(const T& val) const
     {
-
+        return -1;
     }
 
     int remove(const T& val)
     {
-        
+        return -1;
     }
 
 private:
@@ -86,12 +83,11 @@ private:
 
     void remove(std::shared_ptr<Node> n)
     {
-        n.prev->next = n.next;
-        n.next->prev = n.prev;
-        n.prev = n.next = nullptr;
+        n->prev->next = n->next;
+        n->next->prev = n->prev;
     }
 
-    int m_size{ };
+    std::size_t m_size{ };
     std::shared_ptr<Node> m_sentinel{ };
 };
 
