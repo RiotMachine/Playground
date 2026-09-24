@@ -4,6 +4,12 @@
 #include <initializer_list>
 #include <memory>
 
+/*
+    
+    Must assign std::shared_ptr another shared_ptr, not the object itself
+
+*/
+
 template <typename T>
 class DoubleLinkedList
 {
@@ -11,45 +17,49 @@ public:
     DoubleLinkedList(std::initializer_list<T> list)
       : m_size{ list.size() }
     {
-        m_head.next = 
-        m_size = list.size();
+        for (const auto& e : list)
+            postpend(e);
     }
 
     int size() const   { return m_size; }
-    bool empty() const { return *m_head->next == m_tail; }
+    bool empty() const { return m_size == 0; }
 
-    pushFront(const T& val)
+    //Node* begin() const { return m_sentinel.next.get(); }
+    //Node* end() const   { return m_sentinel.prev.get(); }
+
+    void prepend(const T& val)
     {
-        Node n{ m_sentinel.next, &m_sentinel, val };
-        m_head.next = n;
+        auto n{ 
+            std::make_shared<Node>(m_sentinel.next, m_sentinel.next->prev, val)
+        };
+        m_sentinel.next->prev = n;
+        m_sentinel.next = n;
     }
 
-    pushBack
+    void postpend(const T& val)
     {
-
+        auto n{
+            std::make_shared<Node>(m_sentinel.prev->next, m_sentinel.prev, val)
+        };
+        m_sentinel.prev->next = n;
+        m_sentinel.prev = n;
     }
 
-    remove
+    remove(const T& val)
     {
-
+        
     }
 
 private:
     struct Node
     {
-        std::unique_ptr<Node> next{ };
-        std::unique_ptr<Node> prev{ };
+        std::shared_ptr<Node> next{ };
+        std::shared_ptr<Node> prev{ };
         T data{ };
     };
 
-    struct Sentinel
-    {
-        std::shared_ptr
-    }
-
     int m_size{ };
-    Node m_head{ };
-    Node m_tail{ };
+    Node m_sentinel{ };
 };
 
 #endif
