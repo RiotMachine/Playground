@@ -22,6 +22,8 @@ public:
             postpend(e);
     }
 
+    DoubleLinkedList(const DoubleLinkedList&) = delete;
+
     ~DoubleLinkedList()
     {
         while (m_sentinel->next != m_sentinel)
@@ -29,20 +31,19 @@ public:
         m_sentinel = m_sentinel->next = m_sentinel->prev = nullptr;
     }
 
-    std::size_t size() const   { return m_size; }
-    bool empty() const { return m_size == 0; }
+    std::size_t size() const { return m_size; }
+    bool empty() const       { return m_size == 0; }
 
-    //Node* begin() const { return m_sentinel.next.get(); }
-    //Node* end() const   { return m_sentinel.prev.get(); }
-
-    T& operator[](int i)
+    T& operator[](std::size_t i)
     {
+        assert(i < m_size);
 
     }
 
-    const T& operator[](int i) const
+    const T& operator[](std::size_t i) const
     {
-
+        assert(i < m_size);
+        
     }
 
     void prepend(const T& val)
@@ -82,6 +83,9 @@ private:
         std::shared_ptr<Node> prev{ };
         T data{ };
     };
+
+    //Node* begin() const { return m_sentinel->next.get(); }
+    //Node* end() const   { return m_sentinel->prev.get(); }
 
     void remove(std::shared_ptr<Node> n)
     {
