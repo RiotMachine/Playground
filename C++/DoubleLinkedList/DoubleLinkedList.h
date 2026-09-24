@@ -41,13 +41,11 @@ public:
 
     T& operator[](std::size_t i)
     {
-        assert(i < m_size);
 
     }
 
     const T& operator[](std::size_t i) const
     {
-        assert(i < m_size);
         
     }
 
