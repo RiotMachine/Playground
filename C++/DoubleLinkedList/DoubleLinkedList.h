@@ -15,7 +15,7 @@ class DoubleLinkedList
 {
 public:
     DoubleLinkedList(std::initializer_list<T> list)
-      : m_size{ list.size() }
+      : m_size{ list.size() }, m_sentinel{ std::make_shared<Node>(this, this) }
     {
         for (const auto& e : list)
             postpend(e);
@@ -24,7 +24,7 @@ public:
     ~DoubleLinkedList()
     {
         std::shared_ptr<Node> tracer{ m_sentinel.next };
-        while (m_sentinel.next)
+        while (m_sentinel->next.get() != this)
         {
             std::shared_ptr<Node> next{ tracer.next };
             remove(tracer);
@@ -92,7 +92,7 @@ private:
     }
 
     int m_size{ };
-    Node m_sentinel{ };
+    std::shared_ptr<Node> m_sentinel{ };
 };
 
 #endif
