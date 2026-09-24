@@ -1,33 +1,31 @@
 #ifndef DOUBLELINKEDLIST_H
 #define DOUBLELINKEDLIST_H
 
+#include <cstddef>
 #include <initializer_list>
+#include <iterator>
 #include <memory>
 
 /*
   Notes:
     Design Choices
       Wanted to encapsulate Node and pointers to Nodes
-      Gave users [] for traversal
+      Iterator stores a pointer to a Node but provides Node's data
 
     Smart Ptr
-      Must assign std::shared_ptr another shared_ptr, not the object itself
+      Copy assign std::shared_ptr another shared_ptr, not the object itself
       Should not point smart ptrs to items on the stack
+
+    Iterators
+      https://www.internalpointers.com/post/writing-custom-iterators-modern-cpp
+      https://www.fluentcpp.com/2018/05/08/std-iterator-deprecated/
 */
 
 template <typename T>
 class DoubleLinkedList
 {
 public:
-    struct Iterator
-    {
-
-
-
-    }
-
-    Iterator begin() { return m_sentinel-> next; }
-    Iterator end()   { return m_sentinel; }
+    struct Iterator;
 
     DoubleLinkedList(std::initializer_list<T> list)
       : m_size{ list.size() }, m_sentinel{ std::make_shared<Node>() }
@@ -45,6 +43,9 @@ public:
             remove(m_sentinel->next);
         m_sentinel = m_sentinel->next = m_sentinel->prev = nullptr;
     }
+
+    Iterator begin() { return m_sentinel->next; }
+    Iterator end()   { return m_sentinel; }
 
     std::size_t size() const { return m_size; }
     bool empty() const       { return m_size == 0; }
@@ -79,11 +80,6 @@ public:
         ++m_size;
     }
 
-    int search(const T& val) const
-    {
-        return -1;
-    }
-
     int remove(const T& val)
     {
         return -1;
@@ -106,6 +102,50 @@ private:
 
     std::size_t m_size{ };
     std::shared_ptr<Node> m_sentinel{ };
+};
+
+template <typename T>
+struct DoubleLinkedList<T>::Iterator
+{
+public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using difference_type   = std::ptrdiff_t;
+    using value_type        = T;
+    using pointer           = T*;
+    using reference         = T&;
+
+    Iterator(std::shared_ptr<Node> ptr)
+      : m_ptr(ptr.get()) {}
+
+    reference operator*() { return m_ptr->data; }
+    pointer operator->()  { return &(m_ptr->data); }
+    Iterator& operator++() {
+        m_ptr = m_ptr->next.get();
+        return *this;
+    }
+    Iterator operator++(int) {
+        Iterator tmp{ *this };
+        ++(*this);
+        return tmp;
+    }
+    Iterator& operator--() {
+        m_ptr = m_ptr->next.get();
+        return *this;
+    }
+    Iterator operator--(int) {
+        Iterator tmp{ *this };
+        --(*this);
+        return tmp;
+    }
+    friend bool operator==(const Iterator& a, const Iterator& b) {
+        return a.m_ptr == b.m_ptr; 
+    }
+    friend bool operator!=(const Iterator& a, const Iterator& b) {
+        return a.m_ptr != b.m_ptr;
+    }
+
+private:
+    Node* m_ptr;
 };
 
 #endif

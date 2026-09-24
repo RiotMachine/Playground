@@ -6,7 +6,10 @@ void print(const DoubleLinkedList<T>& ll)
 {
     std::cout << std::boolalpha
               << "Size: " << ll.size() << '\n'
-              << "Empty: " << ll.empty() << '\n';
+              << "Empty: " << ll.empty() << '\n'
+              << "Contents: ";
+    for (const auto& e : ll)
+        std::cout << e << ' ';
 }
 
 int main()
