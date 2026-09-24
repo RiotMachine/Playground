@@ -5,9 +5,14 @@
 #include <memory>
 
 /*
-    
-    Must assign std::shared_ptr another shared_ptr, not the object itself
+  Notes:
+    Design Choices
+      Wanted to encapsulate Node and pointers to Nodes
+      Gave users [] for traversal
 
+    Smart Ptr
+      Must assign std::shared_ptr another shared_ptr, not the object itself
+      Should not point smart ptrs to items on the stack
 */
 
 template <typename T>
@@ -83,9 +88,6 @@ private:
         std::shared_ptr<Node> prev{ };
         T data{ };
     };
-
-    //Node* begin() const { return m_sentinel->next.get(); }
-    //Node* end() const   { return m_sentinel->prev.get(); }
 
     void remove(std::shared_ptr<Node> n)
     {
