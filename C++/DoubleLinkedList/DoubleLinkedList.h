@@ -19,6 +19,16 @@ template <typename T>
 class DoubleLinkedList
 {
 public:
+    struct Iterator
+    {
+
+
+
+    }
+
+    Iterator begin() { return m_sentinel-> next; }
+    Iterator end()   { return m_sentinel; }
+
     DoubleLinkedList(std::initializer_list<T> list)
       : m_size{ list.size() }, m_sentinel{ std::make_shared<Node>() }
     {
