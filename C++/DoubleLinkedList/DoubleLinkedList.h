@@ -100,15 +100,8 @@ public:
         ++m_size;
     }
 
-    void remove(const Iterator& it)
-    {
-        remove(it.m_ptr.lock());
-    }
-
-    void remove(std::size_t index)
-    {
-        remove(this->get(index));
-    }
+    void remove(const Iterator& it) { remove(it.m_ptr.lock()); }
+    void remove(std::size_t index)  { remove(this->get(index)); }
 
 private:
     struct Node
