@@ -10,8 +10,9 @@
 /*
   Notes:
     Design Choices
-      Wanted to encapsulate Node and pointers to Nodes
+      Wanted to encapsulate Node and Node*
       Iterator stores a pointer to a Node but provides Node's data
+      Functionally, Iterator safely wraps Node
 
     Smart Ptr
       Copy assign std::shared_ptr another shared_ptr, not the object itself
@@ -45,38 +46,38 @@ public:
         m_sentinel = m_sentinel->next = m_sentinel->prev = nullptr;
     }
 
-    Iterator begin() { return m_sentinel->next; }
-    Iterator end()   { return m_sentinel; }
-
     std::size_t size() const { return m_size; }
     bool empty() const       { return m_size == 0; }
 
+    Iterator begin() { return Iterator { m_sentinel->next }; }
+    Iterator end()   { return Iterator { m_sentinel }; }
+
+    Iterator get(std::size_t index)
+    {
+        assert(index < m_size);
+        Iterator it{ nullptr };
+        if (index < m_size / 2)
+        {
+            it = this->begin();
+            for (std::size_t i{ }; i < index; ++i)
+                ++it;
+        }
+        else
+        {
+            it = this->end();
+            for (std::size_t i{ m_size }; i > index; --i)
+                --it;
+        }
+        return it;
+    }
+
     T& operator[](std::size_t index)
     {
-        assert(index < m_size);
-        auto it{ this->begin() };
-        for (std::size_t i{ }; i < index; ++i)
-            ++it;
-        return *it;
+        return *(this->get(index));
     }
-
     const T& operator[](std::size_t index) const
     {
-        assert(index < m_size);
-        auto it{ this->begin() };
-        for (std::size_t i{ }; i < index; ++i)
-            ++it;
-        return *it;
-    }
-
-    std::size_t search(const T& val)
-    {
-        for (std::size_t i{ }; i < m_size; ++i)
-        {
-            if (*this[i] == val)
-                return i;
-        }
-        return m_size;
+        return *(this->get(index));
     }
 
     void prepend(const T& val)
@@ -99,13 +100,14 @@ public:
         ++m_size;
     }
 
+    void remove(const Iterator& it)
+    {
+        remove(it.m_ptr.lock());
+    }
+
     void remove(std::size_t index)
     {
-        assert(index < m_size);
-        std::weak_ptr n{ m_sentinel->next };
-        for (std::size_t i{ }; i < index; ++i)
-            n = n.lock()->next;
-        remove(n.lock());
+        remove(this->get(index));
     }
 
 private:
@@ -137,7 +139,9 @@ public:
     using pointer           = T*;
     using reference         = T&;
 
-    Iterator(std::shared_ptr<Node> ptr)
+    friend class DoubleLinkedList;
+
+    explicit Iterator(std::shared_ptr<Node> ptr)
       : m_ptr(ptr) {}
 
     reference operator*() { return m_ptr.lock()->data; }
@@ -152,7 +156,7 @@ public:
         return tmp;
     }
     Iterator& operator--() {
-        m_ptr = m_ptr.lock()->next;
+        m_ptr = m_ptr.lock()->prev;
         return *this;
     }
     Iterator operator--(int) {

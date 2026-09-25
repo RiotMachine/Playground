@@ -1,4 +1,5 @@
 #include "DoubleLinkedList.h"
+#include <algorithm>
 #include <iostream>
 
 template <typename T>
@@ -19,7 +20,11 @@ int main()
     print(ll);
     std::cout << '\n';
 
-    ll.remove(1);
+    ll[2] = 5;
+
+    ll.remove(
+        std::find(ll.begin(), ll.end(), 3)
+    );
     print(ll);
 
     return 0;
