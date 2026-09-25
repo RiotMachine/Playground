@@ -2,7 +2,7 @@
 #include <iostream>
 
 template <typename T>
-void print(const DoubleLinkedList<T>& ll)
+void print( DoubleLinkedList<T>& ll)
 {
     std::cout << std::boolalpha
               << "Size: " << ll.size() << '\n'
@@ -10,6 +10,7 @@ void print(const DoubleLinkedList<T>& ll)
               << "Contents: ";
     for (const auto& e : ll)
         std::cout << e << ' ';
+    std::cout << '\n';
 }
 
 int main()
@@ -20,6 +21,9 @@ int main()
     ll.prepend(9);
     ll.postpend(10);
 
+    print(ll);
+
+    ll[1] = 22;
     print(ll);
 
     return 0;

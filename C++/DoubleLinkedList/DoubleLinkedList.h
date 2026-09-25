@@ -1,6 +1,7 @@
 #ifndef DOUBLELINKEDLIST_H
 #define DOUBLELINKEDLIST_H
 
+#include <cassert>
 #include <cstddef>
 #include <initializer_list>
 #include <iterator>
@@ -50,14 +51,22 @@ public:
     std::size_t size() const { return m_size; }
     bool empty() const       { return m_size == 0; }
 
-    T& operator[](std::size_t i)
+    T& operator[](std::size_t index)
     {
-
+        assert(index < m_size);
+        auto it{ this->begin() };
+        for (std::size_t i{ }; i < index; ++i)
+            ++it;
+        return *it;
     }
 
-    const T& operator[](std::size_t i) const
+    const T& operator[](std::size_t index) const
     {
-        
+        assert(index < m_size);
+        auto it{ this->begin() };
+        for (std::size_t i{ }; i < index; ++i)
+            ++it;
+        return *it;
     }
 
     void prepend(const T& val)
@@ -80,9 +89,23 @@ public:
         ++m_size;
     }
 
-    int remove(const T& val)
+    std::size_t search(const T& val)
+    {        
+        for (std::size_t i{ }; i < m_size; ++i)
+        {
+            if (*this[i] == val)
+                return i;
+        }
+        return m_size;
+    }
+
+    int remove(std::size_t index)
     {
-        return -1;
+        assert(index < m_size);
+        auto it{ this->begin() };
+        for (std::size_t i{ }; i < index; ++i)
+            ++it;
+        remove(it.m_ptr.lock());
     }
 
 private:
@@ -115,12 +138,12 @@ public:
     using reference         = T&;
 
     Iterator(std::shared_ptr<Node> ptr)
-      : m_ptr(ptr.get()) {}
+      : m_ptr(ptr) {}
 
-    reference operator*() { return m_ptr->data; }
-    pointer operator->()  { return &(m_ptr->data); }
+    reference operator*() { return m_ptr.lock()->data; }
+    pointer operator->()  { return &(m_ptr.lock()->data); }
     Iterator& operator++() {
-        m_ptr = m_ptr->next.get();
+        m_ptr = m_ptr.lock()->next;
         return *this;
     }
     Iterator operator++(int) {
@@ -129,7 +152,7 @@ public:
         return tmp;
     }
     Iterator& operator--() {
-        m_ptr = m_ptr->next.get();
+        m_ptr = m_ptr.lock()->next;
         return *this;
     }
     Iterator operator--(int) {
@@ -138,14 +161,14 @@ public:
         return tmp;
     }
     friend bool operator==(const Iterator& a, const Iterator& b) {
-        return a.m_ptr == b.m_ptr; 
+        return a.m_ptr.lock() == b.m_ptr.lock(); 
     }
     friend bool operator!=(const Iterator& a, const Iterator& b) {
-        return a.m_ptr != b.m_ptr;
+        return a.m_ptr.lock() != b.m_ptr.lock();
     }
 
 private:
-    Node* m_ptr;
+    std::weak_ptr<Node> m_ptr;
 };
 
 #endif
