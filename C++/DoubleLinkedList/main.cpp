@@ -2,9 +2,9 @@
 #include <iostream>
 
 template <typename T>
-void print( DoubleLinkedList<T>& ll)
+void print(DoubleLinkedList<T>& ll)
 {
-    std::cout << std::boolalpha
+    std::cout << std::boolalpha 
               << "Size: " << ll.size() << '\n'
               << "Empty: " << ll.empty() << '\n'
               << "Contents: ";
@@ -15,15 +15,11 @@ void print( DoubleLinkedList<T>& ll)
 
 int main()
 {
-    DoubleLinkedList<int> ll{ };
+    DoubleLinkedList ll{ 2, 3, 4 };
     print(ll);
+    std::cout << '\n';
 
-    ll.prepend(9);
-    ll.postpend(10);
-
-    print(ll);
-
-    ll[1] = 22;
+    ll.remove(1);
     print(ll);
 
     return 0;

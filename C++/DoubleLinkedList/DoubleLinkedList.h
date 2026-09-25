@@ -29,7 +29,7 @@ public:
     struct Iterator;
 
     DoubleLinkedList(std::initializer_list<T> list)
-      : m_size{ list.size() }, m_sentinel{ std::make_shared<Node>() }
+      : m_size{ }, m_sentinel{ std::make_shared<Node>() }
     {
         m_sentinel->next = m_sentinel->prev = m_sentinel;
         for (const auto& e : list)
@@ -69,6 +69,16 @@ public:
         return *it;
     }
 
+    std::size_t search(const T& val)
+    {
+        for (std::size_t i{ }; i < m_size; ++i)
+        {
+            if (*this[i] == val)
+                return i;
+        }
+        return m_size;
+    }
+
     void prepend(const T& val)
     {
         auto n{ std::make_shared<Node>(
@@ -89,23 +99,13 @@ public:
         ++m_size;
     }
 
-    std::size_t search(const T& val)
-    {        
-        for (std::size_t i{ }; i < m_size; ++i)
-        {
-            if (*this[i] == val)
-                return i;
-        }
-        return m_size;
-    }
-
-    int remove(std::size_t index)
+    void remove(std::size_t index)
     {
         assert(index < m_size);
-        auto it{ this->begin() };
+        std::weak_ptr n{ m_sentinel->next };
         for (std::size_t i{ }; i < index; ++i)
-            ++it;
-        remove(it.m_ptr.lock());
+            n = n.lock()->next;
+        remove(n.lock());
     }
 
 private:
