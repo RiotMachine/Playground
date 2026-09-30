@@ -1,7 +1,6 @@
 #ifndef LINKEDQUEUE_H
 #define LINKEDQUEUE_H
 
-#include <cassert>
 #include <cstddef>
 #include <initializer_list>
 #include <memory>
@@ -10,8 +9,6 @@ template <typename T>
 class LinkedQueue
 {
 public:
-    struct Iterator;
-
     LinkedQueue(std::initializer_list<T> list)
       : m_size{ }, m_head{ }, m_tail{ }
     {
@@ -19,12 +16,17 @@ public:
             enqueue(e);
     }
 
-    LinkedQueue(const LinkedQueue&) = delete;
+    LinkedQueue(const LinkedQueue& lq) { copy(lq); }
 
-    ~LinkedQueue()
+    ~LinkedQueue() { clear(); }
+
+    LinkedQueue& operator=(const LinkedQueue& lq)
     {
-        while (!this->empty())
-            this->dequeue();
+        if (&lq == this)
+            return *this;
+        clear();
+        copy(lq);
+        return *this;
     }
 
     std::size_t size() const { return m_size; }
@@ -48,7 +50,7 @@ public:
         ++m_size;
     }
 
-    void dequeue() 
+    void dequeue()
     {
         m_head = std::move(m_head->next);
         --m_size;
@@ -60,6 +62,21 @@ private:
         T data{ };
         std::unique_ptr<Node> next{ };
     };
+
+    void clear()
+    {
+        while (!empty())
+            dequeue();
+    }
+    void copy(const LinkedQueue& lq)
+    {
+        Node* tracker{ lq.m_head };
+        while (tracker)
+        {
+            enqueue(tracker->data);
+            tracker = tracker->next;
+        }
+    }
 
     std::size_t m_size{ };
     std::unique_ptr<Node> m_head{ };
