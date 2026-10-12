@@ -37,7 +37,7 @@ public:
 
     void enqueue(const T& val)
     {
-        if (this->empty())
+        if (empty())
         {
             m_head = std::make_unique<Node>(Node { val, nullptr });
             m_tail = m_head.get();
@@ -70,11 +70,11 @@ private:
     }
     void copy(const LinkedQueue& lq)
     {
-        Node* tracker{ lq.m_head };
+        Node* tracker{ lq.m_head.get() };
         while (tracker)
         {
             enqueue(tracker->data);
-            tracker = tracker->next;
+            tracker = tracker->next.get();
         }
     }
 
