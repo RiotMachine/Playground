@@ -10,5 +10,8 @@ int main()
     std::cout << "Front: " << lq.front() << "\nSize: "
               << lq.size() << '\n';
 
+
+    LinkedQueue lq2 = lq; 
+
     return 0;
 }
